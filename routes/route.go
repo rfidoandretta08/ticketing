@@ -27,7 +27,7 @@ func SetupRoutes(
 	userGroup := api.Group("/users")
 	{
 		userGroup.Use(middleware.AuthMiddleware("admin")) // hanya admin boleh
-		userGroup.POST("/", userController.CreateUser)
+		userGroup.GET("/", userController.GetAllUsers)
 		userGroup.GET("/:id", userController.GetUserByID)
 	}
 
@@ -51,6 +51,8 @@ func SetupRoutes(
 		ticketGroup.GET("", ticketController.GetUserTickets)
 		ticketGroup.GET("/:id", ticketController.GetTicketByID)
 		ticketGroup.PATCH("/:id", ticketController.CancelTicket)
+		ticketGroup.PATCH("/:id/payment", ticketController.UpdatePayment)
+		ticketGroup.PATCH("/:id/cancel-payment", ticketController.CancelPayment)
 	}
 
 	// REPORT routes (admin only)
@@ -59,5 +61,6 @@ func SetupRoutes(
 	{
 		reportGroup.GET("/summary", reportController.GetSummaryReport)
 		reportGroup.GET("/events", reportController.GetEventReports)
+		reportGroup.GET("/ticket", ticketController.GetAllTickets)
 	}
 }

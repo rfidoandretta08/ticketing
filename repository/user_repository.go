@@ -10,6 +10,7 @@ type UserRepository interface {
 	Create(user *model.User) error
 	FindByEmail(email string) (*model.User, error)
 	FindByID(id uint) (*model.User, error)
+	GetAllUsers() ([]model.User, error)
 }
 
 type userRepository struct {
@@ -34,4 +35,10 @@ func (r *userRepository) FindByID(id uint) (*model.User, error) {
 	var user model.User
 	err := r.db.First(&user, id).Error
 	return &user, err
+}
+
+func (r *userRepository) GetAllUsers() ([]model.User, error) {
+	var users []model.User
+	err := r.db.Find(&users).Error
+	return users, err
 }

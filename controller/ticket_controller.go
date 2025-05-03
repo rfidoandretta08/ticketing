@@ -105,3 +105,49 @@ func (c *TicketController) CancelTicket(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "ticket cancelled successfully"})
 }
+
+func (c *TicketController) UpdatePayment(ctx *gin.Context) {
+	userID := middleware.GetUserID(ctx)
+	ticketID, _ := strconv.Atoi(ctx.Param("id"))
+
+	result, err := c.ticketService.UpdatePayment(userID, uint(ticketID))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
+}
+
+func (c *TicketController) CancelPayment(ctx *gin.Context) {
+	userID := middleware.GetUserID(ctx)
+	ticketID, _ := strconv.Atoi(ctx.Param("id"))
+
+	result, err := c.ticketService.CancelPayment(userID, uint(ticketID))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
+}
+
+func (c *TicketController) GetAllTickets(ctx *gin.Context) {
+	role := middleware.GetUserRole(ctx)
+	if role != "admin" {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
+		return
+	}
+
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+
+	tickets, pagination, err := c.ticketService.GetAllTickets(page, limit)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data":       tickets,
+		"pagination": pagination,
+	})
+}

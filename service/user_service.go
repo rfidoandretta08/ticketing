@@ -9,6 +9,7 @@ type UserService interface {
 	GetUserByID(id uint) (*model.User, error)
 	GetUserByEmail(email string) (*model.User, error)
 	CreateUser(user *model.User) error
+	GetAllUsers() ([]model.User, error)
 }
 
 type userService struct {
@@ -29,4 +30,8 @@ func (s *userService) GetUserByEmail(email string) (*model.User, error) {
 
 func (s *userService) CreateUser(user *model.User) error {
 	return s.userRepo.Create(user)
+}
+
+func (s *userService) GetAllUsers() ([]model.User, error) {
+	return s.userRepo.GetAllUsers()
 }
