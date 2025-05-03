@@ -68,6 +68,11 @@ func (s *ticketService) PurchaseTicket(userID uint, req dto.TicketRequest) (*dto
 		return nil, err
 	}
 
+	event.Capacity -= req.Qty
+	if err := s.eventRepo.Update(event); err != nil {
+		return nil, errors.New("failed to update event capacity")
+	}
+
 	return s.mapTicketToResponse(ticket, event), nil
 }
 
