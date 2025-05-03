@@ -1,0 +1,7 @@
+# .gitignore untuk proyek Go
+bin/
+*.exe
+*.log
+*.tmp
+vendor/
+.env
