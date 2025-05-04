@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"ticketing/dto"
 	"ticketing/service"
+	"ticketing/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,8 +35,7 @@ func (c *EventController) CreateEvent(ctx *gin.Context) {
 }
 
 func (c *EventController) GetAllEvents(ctx *gin.Context) {
-	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	page, limit := utils.ParsePaginationQuery(ctx)
 	search := ctx.Query("search")
 
 	events, pagination, err := c.eventService.GetAllEvents(page, limit, search)

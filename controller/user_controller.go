@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"ticketing/model"
 	"ticketing/service"
+	"ticketing/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,11 +51,16 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 }
 
 func (uc *UserController) GetAllUsers(c *gin.Context) {
-	users, err := uc.userService.GetAllUsers()
+	page, limit := utils.ParsePaginationQuery(c)
+
+	users, pagination, err := uc.userService.GetAllUsers(page, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, gin.H{
+		"data":       users,
+		"pagination": pagination,
+	})
 }

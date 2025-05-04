@@ -6,7 +6,6 @@ import (
 	"ticketing/config"
 	"ticketing/controller"
 	"ticketing/middleware"
-	"ticketing/model"
 	"ticketing/repository"
 	"ticketing/service"
 
@@ -21,11 +20,6 @@ func Run() {
 	db, err := config.ConnectDB(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
-	}
-
-	// Perform auto-migration for models
-	if err := db.AutoMigrate(&model.User{}, &model.Event{}, &model.Ticket{}); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	// Initialize repositories
@@ -55,7 +49,7 @@ func Run() {
 	router.Use(middleware.ErrorHandler()) // Global error handler
 
 	// Register routes
-	SetupRoutes(router, db, authController, userController, eventController, ticketController, reportController)
+	SetupRoutes(router, db, authController, userController, eventController, ticketController, reportController, reportService)
 
 	// Set server port, default to 8080
 	port := os.Getenv("PORT")

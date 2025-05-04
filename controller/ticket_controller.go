@@ -7,6 +7,7 @@ import (
 	"ticketing/dto"
 	"ticketing/middleware"
 	"ticketing/service"
+	"ticketing/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -137,8 +138,7 @@ func (c *TicketController) GetAllTickets(ctx *gin.Context) {
 		return
 	}
 
-	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	page, limit := utils.ParsePaginationQuery(ctx)
 
 	tickets, pagination, err := c.ticketService.GetAllTickets(page, limit)
 	if err != nil {

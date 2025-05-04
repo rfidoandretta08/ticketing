@@ -11,6 +11,7 @@ type UserRepository interface {
 	Create(user *model.User) error
 	FindByEmail(email string) (*model.User, error)
 	FindByID(id uint) (*model.User, error)
+	FindAllUsers(page, limit int) ([]model.User, int64, error)
 	GetAllUsers() ([]model.User, error)
 }
 
@@ -48,4 +49,22 @@ func (r *userRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
 	err := r.db.Find(&users).Error
 	return users, err
+}
+
+func (r *userRepository) FindAllUsers(page, limit int) ([]model.User, int64, error) {
+	var users []model.User
+	var total int64
+
+	// Menghitung jumlah total data
+	if err := r.db.Model(&model.User{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Mengambil data dengan limit dan offset
+	offset := (page - 1) * limit
+	if err := r.db.Offset(offset).Limit(limit).Find(&users).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
 }
