@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"ticketing/dto"
 	"ticketing/model"
 	"ticketing/service"
 
@@ -17,13 +18,30 @@ func NewAuthController(authService service.AuthService) *AuthController {
 }
 
 func (ac *AuthController) Register(c *gin.Context) {
-	var user model.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+	var req dto.RegisterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdUser, err := ac.authService.Register(&user)
+	// Konversi string ke model.Role
+	var role model.Role
+	if req.Role != "" {
+		role = model.Role(req.Role) // Mengonversi string ke model.Role
+	} else {
+		// Jika tidak ada role, gunakan default 'user'
+		role = model.Users
+	}
+
+	// Membuat objek User dari DTO
+	user := &model.User{
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password, // Jangan lupa untuk hash password jika diperlukan
+		Role:     role,         // Gunakan tipe model.Role
+	}
+
+	createdUser, err := ac.authService.Register(user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

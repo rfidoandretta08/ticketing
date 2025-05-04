@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"ticketing/model"
 	"ticketing/repository"
 	"ticketing/utils"
@@ -28,6 +30,8 @@ func (s *authService) Login(email, password string) (string, *model.User, error)
 		return "", nil, errors.New("invalid email or password")
 	}
 
+	password = strings.TrimSpace(password)
+
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return "", nil, errors.New("invalid email or password")
@@ -42,7 +46,6 @@ func (s *authService) Login(email, password string) (string, *model.User, error)
 }
 
 func (s *authService) Register(user *model.User) (*model.User, error) {
-	// Cek apakah email sudah terdaftar
 	existing, _ := s.userRepo.FindByEmail(user.Email)
 	if existing != nil && existing.ID != 0 {
 		return nil, errors.New("email already registered")
@@ -53,6 +56,8 @@ func (s *authService) Register(user *model.User) (*model.User, error) {
 		return nil, err
 	}
 	user.Password = string(hashedPassword)
+
+	fmt.Println("DEBUG: Hashed password (to save):", user.Password)
 
 	if err := s.userRepo.Create(user); err != nil {
 		return nil, err
